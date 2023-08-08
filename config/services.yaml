@@ -4,6 +4,11 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.erp_server: '%env(ERP_SERVER)%'
+    app.erp_username: '%env(ERP_USERNAME)%'
+    app.erp_password: '%env(ERP_PASSWORD)%'
+    app.erp_appname: '%env(ERP_APPNAME)%'
+    app.erp_company: '%env(ERP_COMPANY)%'
 
 services:
     # default configuration for services in *this* file
@@ -19,6 +24,12 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+        bind:
+            $erpServer: "%app.erp_server%"
+            $erpUsername: "%app.erp_username%"
+            $erpPassword: "%app.erp_password%"
+            $erpAppname: "%app.erp_appname%"
+            $erpCompany: "%app.erp_company%"
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

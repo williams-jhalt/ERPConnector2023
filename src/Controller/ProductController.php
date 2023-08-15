@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\ProductService;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +17,18 @@ class ProductController extends AbstractController
 
         $limit = (int) $request->get('limit', 100);
         $offset = (int) $request->get('offset', 0);
+        
+        if (($since = $request->get('since', null)) !== null) {
 
-        $products = $productService->getProducts($limit, $offset);
+            $date = DateTimeImmutable::createFromFormat('m-d-Y', $since);
+
+            $products = $productService->getNewProducts($date, $limit, $offset);
+
+        } else {
+
+            $products = $productService->getProducts($limit, $offset);
+
+        }
 
         $data = [];
 
@@ -34,6 +45,7 @@ class ProductController extends AbstractController
                 'on_hand_quantity' => $product->getOnHandQuantity(),
                 'active' => $product->getActive(),
                 'date_created' => $product->getDateCreated(),
+                'release_date' => $product->getReleaseDate(),
                 'upc' => $product->getUpc(),
                 'max_discount_rate' => $product->getMaxDiscountRate(),
                 'saleable' => $product->getSaleable()
@@ -60,6 +72,7 @@ class ProductController extends AbstractController
             'on_hand_quantity' => $product->getOnHandQuantity(),
             'active' => $product->getActive(),
             'date_created' => $product->getDateCreated(),
+            'release_date' => $product->getReleaseDate(),
             'upc' => $product->getUpc(),
             'max_discount_rate' => $product->getMaxDiscountRate(),
             'saleable' => $product->getSaleable()

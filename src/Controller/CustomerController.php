@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Service\CustomerService;
+use DateTimeImmutable;
+use DateTimeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,8 +18,18 @@ class CustomerController extends AbstractController
 
         $limit = (int) $request->get('limit', 100);
         $offset = (int) $request->get('offset', 0);
+        
+        if (($since = $request->get('since', null)) !== null) {
 
-        $customers = $customerService->getCustomers($limit, $offset);
+            $date = DateTimeImmutable::createFromFormat('m-d-Y', $since);
+
+            $customers = $customerService->getNewCustomers($date, $limit, $offset);
+
+        } else {
+
+            $customers = $customerService->getCustomers($limit, $offset);
+
+        }
 
         $data = [];
 

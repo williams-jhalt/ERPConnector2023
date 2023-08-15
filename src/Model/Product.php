@@ -14,6 +14,7 @@ class Product
     private $onHandQuantity;
     private $active;
     private $dateCreated;
+    private $releaseDate;
     private $upc;
     private $maxDiscountRate;
     private $saleable;
@@ -133,6 +134,15 @@ class Product
     public function setSaleable($saleable)
     {
         $this->saleable = $saleable;
+        return $this;
+    }
+
+    public function getReleaseDate() {
+        return $this->releaseDate;
+    }
+
+    public function setReleaseDate($releaseDate) {
+        $this->releaseDate = $releaseDate;
         return $this;
     }
 }

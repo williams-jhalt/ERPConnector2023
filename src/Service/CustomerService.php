@@ -3,87 +3,150 @@
 namespace App\Service;
 
 use App\Model\Customer;
+use DateTimeInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CustomerService
 {
 
     public function __construct(
+        private CacheInterface $cache,
         private LoggerInterface $logger,
         private ErpService $service,
         private string $erpCompany
     ) {
     }
 
+    public function getNewCustomers(DateTimeInterface $since, int $limit = 100, int $offset = 0): array
+    {
+
+        $datestr = $since->format('m/d/Y');
+
+        $cacheId = md5("getNewCustomers:$datestr:$limit:$offset");
+
+        return $this->cache->get($cacheId, function (ItemInterface $item) use ($datestr, $limit, $offset) {
+            $item->expiresAfter(3600);
+
+            $query = "FOR EACH customer NO-LOCK " .
+            "WHERE customer.company_cu = '" . $this->erpCompany . "' " . 
+            "AND customer.opn_date > '" . $datestr . "'";
+
+            $fields = ' customer.company_cu, ' .
+                'customer.profile,  ' .
+                'customer.customer,  ' .
+                'customer.name,  ' .
+                'customer.adr,  ' .
+                'customer.state,  ' .
+                'customer.postal_code,  ' .
+                'customer.country_code,  ' .
+                'customer.phone,  ' .
+                'customer.cell_phone, ' .
+                'customer.fax,  ' .
+                'customer.email_address,  ' .
+                'customer.atn,  ' .
+                'customer.cr_mgr,  ' .
+                'customer.opn_date,  ' .
+                'customer.Active,  ' .
+                'customer.cr_limit ';
+
+            $response = $this->service->read($query, $fields, $limit, $offset);
+
+            $result = array();
+
+            foreach ($response as $erpItem) {
+                $result[] = $this->_buildFromErp($erpItem);
+            }
+
+            return $result;
+
+        });
+
+    }
+
     public function getCustomers(int $limit = 100, int $offset = 0): array
     {
-        $query = "FOR EACH customer NO-LOCK WHERE customer.company_cu = '" . $this->erpCompany . "'";
 
-        $fields = ' customer.company_cu, ' .
-            'customer.profile,  ' .
-            'customer.customer,  ' .
-            'customer.name,  ' .
-            'customer.adr,  ' .
-            'customer.state,  ' .
-            'customer.postal_code,  ' .
-            'customer.country_code,  ' .
-            'customer.phone,  ' .
-            'customer.cell_phone, ' .
-            'customer.fax,  ' .
-            'customer.email_address,  ' .
-            'customer.atn,  ' .
-            'customer.cr_mgr,  ' .
-            'customer.opn_date,  ' .
-            'customer.Active,  ' .
-            'customer.cr_limit ';
+        $cacheId = md5("getCustomers:$limit:$offset");
 
-        $response = $this->service->read($query, $fields, $limit, $offset);
+        return $this->cache->get($cacheId, function (ItemInterface $item) use ($limit, $offset) {
+            $item->expiresAfter(3600);
 
-        $result = array();
+            $query = "FOR EACH customer NO-LOCK WHERE customer.company_cu = '" . $this->erpCompany . "'";
 
-        foreach ($response as $erpItem) {
-            $result[] = $this->_buildFromErp($erpItem);
-        }
+            $fields = ' customer.company_cu, ' .
+                'customer.profile,  ' .
+                'customer.customer,  ' .
+                'customer.name,  ' .
+                'customer.adr,  ' .
+                'customer.state,  ' .
+                'customer.postal_code,  ' .
+                'customer.country_code,  ' .
+                'customer.phone,  ' .
+                'customer.cell_phone, ' .
+                'customer.fax,  ' .
+                'customer.email_address,  ' .
+                'customer.atn,  ' .
+                'customer.cr_mgr,  ' .
+                'customer.opn_date,  ' .
+                'customer.Active,  ' .
+                'customer.cr_limit ';
 
-        return $result;
+            $response = $this->service->read($query, $fields, $limit, $offset);
+
+            $result = array();
+
+            foreach ($response as $erpItem) {
+                $result[] = $this->_buildFromErp($erpItem);
+            }
+
+            return $result;
+
+        });
 
     }
 
     public function getCustomer(string $customerNumber): Customer
     {
-        $query = "FOR EACH customer NO-LOCK "
-            . "WHERE customer.company_cu = '" . $this->erpCompany . "'"
-            . "AND customer.customer EQ '" . $customerNumber . "'";
+
+        $cacheId = md5("getCustomer:$customerNumber");
+
+        return $this->cache->get($cacheId, function (ItemInterface $item) use ($customerNumber) {
+            $item->expiresAfter(3600);
+
+            $query = "FOR EACH customer NO-LOCK "
+                . "WHERE customer.company_cu = '" . $this->erpCompany . "'"
+                . "AND customer.customer EQ '" . $customerNumber . "'";
 
             $fields = ' customer.company_cu, ' .
-            'customer.profile,  ' .
-            'customer.customer,  ' .
-            'customer.name,  ' .
-            'customer.adr,  ' .
-            'customer.state,  ' .
-            'customer.postal_code,  ' .
-            'customer.country_code,  ' .
-            'customer.phone,  ' .
-            'customer.cell_phone, ' .
-            'customer.fax,  ' .
-            'customer.email_address,  ' .
-            'customer.atn,  ' .
-            'customer.cr_mgr,  ' .
-            'customer.opn_date,  ' .
-            'customer.Active,  ' .
-            'customer.cr_limit ';
+                'customer.profile,  ' .
+                'customer.customer,  ' .
+                'customer.name,  ' .
+                'customer.adr,  ' .
+                'customer.state,  ' .
+                'customer.postal_code,  ' .
+                'customer.country_code,  ' .
+                'customer.phone,  ' .
+                'customer.cell_phone, ' .
+                'customer.fax,  ' .
+                'customer.email_address,  ' .
+                'customer.atn,  ' .
+                'customer.cr_mgr,  ' .
+                'customer.opn_date,  ' .
+                'customer.Active,  ' .
+                'customer.cr_limit ';
 
-        $response = $this->service->read($query, $fields, 1);
+            $response = $this->service->read($query, $fields, 1);
 
-        return $this->_buildFromErp($response[0]);
+            return $this->_buildFromErp($response[0]);
 
+        });
 
     }
 
     private function _buildFromErp($erpItem)
     {
-
-        $this->logger->info("Building customer from: " . print_r($erpItem, true));
 
         $t = new Customer();
         $t->setCompany($erpItem['customer_company_cu'])

@@ -21,7 +21,7 @@ class InvoiceService
     public function getInvoices(int $limit = 100, int $offset = 0): array
     {
 
-        $cacheId = md5("getInvoices:$limit:$offset");
+        $cacheId = md5("InvoiceService:getInvoices:$limit:$offset");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($limit, $offset) {
             $item->expiresAfter(3600);
@@ -62,7 +62,7 @@ class InvoiceService
     public function getInvoice(string $orderNumber): Invoice
     {
 
-        $cacheId = md5("getInvoice:$orderNumber");
+        $cacheId = md5("InvoiceService:getInvoice:$orderNumber");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($orderNumber) {
             $item->expiresAfter(3600);

@@ -24,7 +24,7 @@ class CustomerService
 
         $datestr = $since->format('m/d/Y');
 
-        $cacheId = md5("getNewCustomers:$datestr:$limit:$offset");
+        $cacheId = md5("CustomerService:getNewCustomers:$datestr:$limit:$offset");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($datestr, $limit, $offset) {
             $item->expiresAfter(3600);
@@ -68,7 +68,7 @@ class CustomerService
     public function getCustomers(int $limit = 100, int $offset = 0): array
     {
 
-        $cacheId = md5("getCustomers:$limit:$offset");
+        $cacheId = md5("CustomerService:getCustomers:$limit:$offset");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($limit, $offset) {
             $item->expiresAfter(3600);
@@ -110,7 +110,7 @@ class CustomerService
     public function getCustomer(string $customerNumber): Customer
     {
 
-        $cacheId = md5("getCustomer:$customerNumber");
+        $cacheId = md5("CustomerService:getCustomer:$customerNumber");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($customerNumber) {
             $item->expiresAfter(3600);

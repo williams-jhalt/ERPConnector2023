@@ -24,7 +24,7 @@ class ProductService
 
         $datestr = $since->format('m/d/Y');
 
-        $cacheId = md5("getNewProducts:$datestr:$limit:$offset");
+        $cacheId = md5("ProductService:getNewProducts:$datestr:$limit:$offset");
 
         return $this->cache->get($cacheId, function(ItemInterface $item) use($datestr, $limit, $offset) { 
 
@@ -63,7 +63,7 @@ class ProductService
     public function getProducts(int $limit = 100, int $offset = 0): array
     {
 
-        $cacheId = md5("getProducts:$limit:$offset");
+        $cacheId = md5("ProductService:getProducts:$limit:$offset");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($limit, $offset) {
             $item->expiresAfter(3600);
@@ -101,7 +101,7 @@ class ProductService
     public function getProduct(string $itemNumber): Product
     {
 
-        $cacheId = md5("getProduct:$itemNumber");
+        $cacheId = md5("ProductService:getProduct:$itemNumber");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($itemNumber) {
             $item->expiresAfter(3600);

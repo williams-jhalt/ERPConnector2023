@@ -21,7 +21,7 @@ class ShippedItemService
     public function getShippedItems($orderNumber, int $limit = 100, int $offset = 0): array
     {
 
-        $cacheId = md5("getShippedItems:$orderNumber:$limit:$offset");
+        $cacheId = md5("ShippedItemService:getShippedItems:$orderNumber:$limit:$offset");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($orderNumber, $limit, $offset) {
             $item->expiresAfter(3600);

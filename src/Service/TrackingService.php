@@ -21,7 +21,7 @@ class TrackingService
     public function getTracking($orderNumber): Tracking
     {
 
-        $cacheId = md5("getTracking:$orderNumber");
+        $cacheId = md5("TrackingService:getTracking:$orderNumber");
 
         return $this->cache->get($cacheId, function (ItemInterface $item) use ($orderNumber) {
             $item->expiresAfter(3600);

@@ -139,7 +139,7 @@ class ProductService
         $t->setCompany($erpItem['item_company_it'])
             ->setWebsite($erpItem['item_profile'][0])
             ->setItemNumber($erpItem['item_item'])
-            ->setName($erpItem['item_descr'][0])
+            ->setName($erpItem['item_descr'][0] . $erpItem['item_descr'][1])
             ->setTypeCode($erpItem['item_profile'][2])
             ->setManufacturerCode($erpItem['item_profile'][4])
             ->setWholesalePrice($erpItem['wa_item_list_price'])
